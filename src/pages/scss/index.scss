@@ -1,0 +1,28 @@
+@import 'products';
+@import 'cart';
+
+.link {
+  text-decoration: none;
+  color: inherit;
+}
+
+body {
+  padding: 0px;
+  margin: 0px;
+  box-sizing: border-box;
+}
+
+#root {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 0.5rem;
+}
+
+.gnb {
+
+  ul {
+    list-style: none;
+    display: flex;
+    gap: 0.5rem;
+  }
+}
