@@ -1,19 +1,86 @@
 import { Cart } from "../../../graphql/cart/cart";
 import CartItem from "./CartItem";
-import '../../scss/cart.scss';
+import "../../scss/cart.scss";
+import { SyntheticEvent, createRef, useEffect, useRef, useState } from "react";
+import { useRecoilState } from "recoil";
+import { checkedCartState } from "../../../recoils/cart";
+import PaymentPrice from "./PaymentPrice";
 
 export default function CartList({ items }: { items: Cart[] }) {
+  const [checkedData, setCheckedData] = useRecoilState(checkedCartState);
+
+  const [formData, setFormData] = useState<FormData>();
+
+  const formRef = useRef<HTMLFormElement>(null);
+  const checkboxRefs = items.map(() => createRef<HTMLInputElement>());
+
+  const setAllCheckedFromItems = () => {
+    if (!formRef.current) return;
+    const data = new FormData(formRef.current);
+    const selectedCount = data.getAll("select-item").length;
+    const allChecked = selectedCount === items.length;
+    formRef.current.querySelector<HTMLInputElement>(".select-all")!.checked =
+      allChecked;
+  };
+
+  const setItemsCheckedFromAll = (targetInput: HTMLInputElement) => {
+    const allChecked = targetInput.checked;
+    checkboxRefs.forEach((inputElem) => {
+      inputElem.current!.checked = allChecked;
+    });
+  };
+
+  const handleCheckboxChanged = (e?: SyntheticEvent) => {
+    if (!formRef.current) return;
+
+    const targetInput = e?.target as HTMLInputElement;
+    if (targetInput && targetInput.classList.contains("select-all")) {
+      setItemsCheckedFromAll(targetInput);
+    } else {
+      setAllCheckedFromItems();
+    }
+
+    const data = new FormData(formRef.current);
+    setFormData(data);
+  };
+
+  useEffect(() => {
+    checkedData.forEach((item) => {
+      const itemRef = checkboxRefs.find(
+        (ref) => ref.current!.dataset.id === item.id
+      );
+      if (itemRef) {
+        itemRef.current!.checked = true;
+      }
+      setAllCheckedFromItems();
+    });
+  }, []);
+
+  useEffect(() => {
+    const checkedItems = checkboxRefs.reduce<Cart[]>((result, ref, i) => {
+      if (ref.current!.checked) {
+        result.push(items[i]);
+      }
+
+      return result;
+    }, []);
+    setCheckedData(checkedItems);
+  }, [items, formData]);
+
   return (
-    <>
-    <label>
-      <input type="checkbox" />
-      전체선택
-    </label>
-    <ul className="cart">
-      {items.map((item) => (
-        <CartItem {...item} key={item.id} />
-      ))}
-    </ul>
-    </>
+    <div>
+      <form ref={formRef} onChange={handleCheckboxChanged}>
+        <label>
+          <input className="select-all" name="select-all" type="checkbox" />
+          전체선택
+        </label>
+        <ul className="cart">
+          {items.map((item, i) => (
+            <CartItem {...item} key={item.id} ref={checkboxRefs[i]} />
+          ))}
+        </ul>
+      </form>
+      <PaymentPrice />
+    </div>
   );
 }
