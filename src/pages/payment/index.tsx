@@ -1,6 +1,5 @@
+import Payment from "./_components/Payment";
 
 export default function PaymentIndex() {
-  return (
-    <div>index</div>
-  )
+  return <Payment />;
 }

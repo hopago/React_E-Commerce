@@ -4,10 +4,13 @@ import "../../scss/cart.scss";
 import { SyntheticEvent, createRef, useEffect, useRef, useState } from "react";
 import { useRecoilState } from "recoil";
 import { checkedCartState } from "../../../recoils/cart";
-import PaymentPrice from "./PaymentPrice";
+import PaymentPrice from "../../components/payment/PaymentPrice";
+import { useNavigate } from "react-router-dom";
 
 export default function CartList({ items }: { items: Cart[] }) {
   const [checkedData, setCheckedData] = useRecoilState(checkedCartState);
+  
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState<FormData>();
 
@@ -42,6 +45,14 @@ export default function CartList({ items }: { items: Cart[] }) {
 
     const data = new FormData(formRef.current);
     setFormData(data);
+  };
+
+  const handleSubmit = () => {
+    if (checkedData.length) {
+      navigate("/payment");
+    } else {
+      alert("선택 상품이 없습니다.");
+    }
   };
 
   useEffect(() => {
@@ -80,7 +91,7 @@ export default function CartList({ items }: { items: Cart[] }) {
           ))}
         </ul>
       </form>
-      <PaymentPrice />
+      <PaymentPrice handleSubmit={handleSubmit} submitTitle="결제창으로 이동" />
     </div>
   );
 }
