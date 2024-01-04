@@ -1,10 +1,12 @@
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
-import schema from "./schema";
+import schema from "./schema/index.js";
+import resolvers from "./resolvers/index.js"
 
 (async () => {
   const server = new ApolloServer({
-    typeDefs: schema
+    typeDefs: schema,
+    resolvers
   });
   const app = express();
 
@@ -18,6 +20,6 @@ import schema from "./schema";
     },
   });
 
-  app.listen({ port: 8000 });
-  console.log("Server listening on port 8000...");
+  app.listen({ port: 8181 });
+  console.log("Server listening on port 8181...");
 })();
