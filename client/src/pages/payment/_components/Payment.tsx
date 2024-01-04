@@ -8,18 +8,13 @@ import { useMutation } from "react-query";
 import { graphqlFetcher } from "../../../lib/react-query/queryClient";
 import { EXECUTE_PAYMENT } from "../../../graphql/payment/payment";
 
-type PayInfo = {
-  id: string;
-  amount: number;
-}
-
-type PaymentInfo = PayInfo[]
+type PayInfo = string[]
 
 export default function Payment() {
   const [checkedCartData, setCheckedCartData] = useRecoilState(checkedCartState);
 
-  const { mutate: executePayment } = useMutation((payInfos: PaymentInfo) =>
-    graphqlFetcher(EXECUTE_PAYMENT, payInfos)
+  const { mutate: executePayment } = useMutation((payInfo: PayInfo) =>
+    graphqlFetcher(EXECUTE_PAYMENT, payInfo)
   );
 
   const navigate = useNavigate();
@@ -33,7 +28,7 @@ export default function Payment() {
   const onProceed = () => {
     // 결제
 
-    const payInfo = checkedCartData.map(({ id, amount }) => ({ id, amount }));
+    const payInfo: PayInfo = checkedCartData.map(({ id }) => id);
     executePayment(payInfo);
 
     setCheckedCartData([]);
