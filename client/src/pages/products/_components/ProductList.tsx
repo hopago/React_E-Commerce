@@ -1,5 +1,5 @@
 import { useQuery } from "react-query";
-import "../scss/index.scss";
+import '../../scss/index.scss';
 import GET_PRODUCTS, { Product } from "../../../graphql/products/products";
 import {
   QueryKeys,

@@ -11,10 +11,17 @@ import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import schema from "./schema/index.js";
 import resolvers from "./resolvers/index.js";
+import { DBField, readDB } from "./dbController.js";
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const server = new ApolloServer({
         typeDefs: schema,
-        resolvers
+        resolvers,
+        context: {
+            db: {
+                products: readDB(DBField.PRODUCTS),
+                cart: readDB(DBField.CART)
+            }
+        }
     });
     const app = express();
     yield server.start();
@@ -22,10 +29,10 @@ import resolvers from "./resolvers/index.js";
         app,
         path: "/graphql",
         cors: {
-            origin: ["http://localhost:3000"],
+            origin: ["http://localhost:3000", "https://studio.apollographql.com"],
             credentials: true,
         },
     });
     app.listen({ port: 8181 });
-    console.log("Server listening on port 8000...");
+    console.log("Server listening on port 8181...");
 }))();

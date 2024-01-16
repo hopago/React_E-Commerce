@@ -2,10 +2,8 @@ import { gql } from "apollo-server-express";
 const cartSchema = gql `
   type CartItem {
     id: String!
-    imageUrl: String!
-    price: Int!
-    title: String!
     amount: Int!
+    product: Product!
   }
 
   extend type Query {

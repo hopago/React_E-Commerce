@@ -1,81 +1,79 @@
 import { Resolver } from "./types.js";
 
-const mockProducts = (() => {
-  return Array.from({ length: 20 }).map((_, i) => ({
-    id: i + 1 + "",
-    imageUrl: `https://picsum.photos/id/${i + 10}/200/150`,
-    price: 50000,
-    title: `임시상품 ${i + 1}`,
-    description: `임시상세내용 ${i + 1}`,
-    createdAt: new Date(1645735501863 + i + 1000 * 10).toString(),
-  }));
-})();
-
-let cartData = [
-  {
-    id: "1",
-    amount: 1,
-  },
-  {
-    id: "2",
-    amount: 2,
-  },
-];
-
 const cartResolvers: Resolver = {
   Query: {
-    cart: () => {
-      return cartData;
+    cart: (_1, _2, { db }) => {
+      return db.cart;
     },
   },
   Mutation: {
-    addCart: (_: any, { id }) => {
-      const newCartData = [...cartData];
-      const findIndex = mockProducts.findIndex((item) => item.id === id);
-      const targetProduct = mockProducts.find((item) => item.id === id);
+    addCart: (_: any, { id }, { db }) => {
+      if (!id) throw Error("상품 ID가 필요합니다...");
+
+      const targetProduct = db.products.find((item) => item.id === id);
       if (!targetProduct) throw new Error("상품이 없습니다...");
 
-      const newItem = {
-        ...targetProduct,
-        amount: (newCartData[findIndex]?.amount || 0) + 1,
-      };
-      newCartData[findIndex] = newItem;
-      cartData = newCartData;
+      let newItem;
+
+      const findCartIndex = db.cart.findIndex(item => item.id === id);
+      if (findCartIndex) {
+        newItem = {
+          ...db.cart[findCartIndex],
+          amount: (db.cart[findCartIndex].amount || 0) + 1,
+        };
+
+        db.cart.splice(findCartIndex, 1, newItem);
+      } else {
+        newItem = {
+          id,
+          product: {
+            ...targetProduct,
+          },
+          amount: 1,
+        };
+
+        db.cart.push(newItem);
+      }
 
       return newItem;
     },
-    updateCart: (_: any, { id, amount }) => {
-      const newData = [...cartData];
-      const findIndex = newData.findIndex((item) => item.id === id);
+    updateCart: (_: any, { id, amount }, { db }) => {
+      const newCart = [...db.cart];
+      const findIndex = newCart.findIndex((item) => item.id === id);
       if (!findIndex) throw new Error("없는 데이터입니다...");
 
       const newItem = {
-        ...newData[findIndex],
+        ...newCart[findIndex],
         amount,
       };
-      newData[findIndex] = newItem;
-      cartData = newData;
+      newCart[findIndex] = newItem;
+      db.cart = newCart;
 
       return newItem;
     },
-    deleteCart: (_: any, { id }) => {
-      const newData = [...cartData];
-      const findIndex = cartData.findIndex((item) => item.id === id);
+    deleteCart: (_: any, { id }, { db }) => {
+      const newData = [...db.cart];
+      const findIndex = db.cart.findIndex((item) => item.id === id);
       if (!findIndex) throw new Error("없는 데이터입니다...");
 
       delete newData[findIndex];
-      cartData = newData;
+      db.cart = newData;
 
       return id;
     },
-    executePayment: (_: any, { ids }) => {
-      const newCartData = cartData.filter((cartItem) => {
+    executePayment: (_: any, { ids }, { db }) => {
+      const newCartData = db.cart.filter((cartItem) => {
         !ids.includes(cartItem.id);
       });
 
-      cartData = newCartData;
+      db.cart = newCartData;
 
       return ids;
+    },
+  },
+  CartItem: {
+    product: (cartItem, _, { db }) => {
+      return db.products.find(product => product.id === cartItem.id);
     },
   },
 };
