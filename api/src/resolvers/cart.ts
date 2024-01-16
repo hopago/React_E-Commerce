@@ -28,7 +28,7 @@ const cartResolvers: Resolver = {
           amount: (db.cart[findCartIndex].amount || 0) + 1,
         };
 
-        db.cart.splice(findCartIndex, 1, newItem);
+        db.cart[findCartIndex] = newItem;
 
         try {
           setJSON(db.cart);

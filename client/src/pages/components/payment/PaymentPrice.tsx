@@ -12,7 +12,8 @@ export default function PaymentPrice({
 }) {
   const checkedItems = useRecoilValue(checkedCartState);
 
-  const totalPrice = checkedItems.reduce((res, { price, amount }) => {
+  const totalPrice = checkedItems.reduce((res, { product, amount }) => {
+    const { price } = product;
     res = price * amount;
     return res;
   }, 0);
@@ -22,9 +23,9 @@ export default function PaymentPrice({
       <ul>
         {checkedItems.map((item) => (
           <li key={item.id}>
-            <PaymentItem {...item} />
+            <PaymentItem {...item.product} />
             <p>수량: {item.amount}</p>
-            <p>금액: {item.price * item.amount}</p>
+            <p>금액: {item.product.price * item.amount}</p>
           </li>
         ))}
       </ul>

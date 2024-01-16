@@ -1,11 +1,11 @@
-import { Cart } from "../../../graphql/cart/cart";
+import { Product } from "../../../graphql/products/products";
 
 export default function PaymentItem({
   imageUrl,
   id,
   price,
   title,
-}: Pick<Cart, "imageUrl" | "id" | "price" | "title">) {
+}: Product) {
   return (
     <>
       <img src={imageUrl} alt={`cart${id}`} />

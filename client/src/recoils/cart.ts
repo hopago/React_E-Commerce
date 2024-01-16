@@ -1,9 +1,9 @@
-import { atom, selectorFamily } from "recoil";
+import { atom, selector } from "recoil";
 import { Cart } from "../graphql/cart/cart";
 
 export const checkedCartState = atom<Cart[]>({
   key: "cartState",
-  default: []
+  default: [],
 });
 
 // export const cartItemSelector = selectorFamily<number | undefined, string>({

@@ -4,11 +4,15 @@ import { useParams } from "react-router-dom";
 import ProductDetail from './_components/ProductDetail'
 import { GET_PRODUCT, Product } from "../../graphql/products/products";
 
+type QueryResult = {
+  product: Product
+}
+
 export default function ProductsId() {
   const { id } = useParams();
 
-  const { data } = useQuery<Product>([QueryKeys.PRODUCTS, id], () =>
-    graphqlFetcher<Product>(GET_PRODUCT, { id })
+  const { data } = useQuery<QueryResult>([QueryKeys.PRODUCTS, id], () =>
+    graphqlFetcher<QueryResult>(GET_PRODUCT, { productId: id })
   );
 
   if (!data) {
@@ -18,7 +22,7 @@ export default function ProductsId() {
   return (
     <>
       <h1>상품 상세</h1>
-      <ProductDetail product={data} />
+      <ProductDetail product={data.product} />
     </>
   );
 }

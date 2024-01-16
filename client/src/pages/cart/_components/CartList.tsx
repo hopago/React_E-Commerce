@@ -1,13 +1,18 @@
 import { Cart } from "../../../graphql/cart/cart";
-import CartItem from "./CartItem";
 import "../../scss/cart.scss";
 import { SyntheticEvent, createRef, useEffect, useRef, useState } from "react";
 import { useRecoilState } from "recoil";
 import { checkedCartState } from "../../../recoils/cart";
 import PaymentPrice from "../../components/payment/PaymentPrice";
 import { useNavigate } from "react-router-dom";
+import { CartItems } from "..";
+import CartItem from "./CartItem";
 
-export default function CartList({ items }: { items: Cart[] }) {
+type Props = {
+  items: CartItems;
+};
+
+export default function CartList({ items }: Props) {
   const [checkedData, setCheckedData] = useRecoilState(checkedCartState);
   
   const navigate = useNavigate();
@@ -87,7 +92,11 @@ export default function CartList({ items }: { items: Cart[] }) {
         </label>
         <ul className="cart">
           {items.map((item, i) => (
-            <CartItem {...item} key={item.id} ref={checkboxRefs[i]} />
+            <CartItem
+              item={item}
+              key={item.id}
+              ref={checkboxRefs[i]}
+            />
           ))}
         </ul>
       </form>

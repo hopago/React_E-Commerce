@@ -1,44 +1,67 @@
 import { gql } from "graphql-request";
+import { Product } from "../products/products";
 
 export type Cart = {
   id: string;
-  imageUrl: string;
-  price: number;
-  title: string;
   amount: number;
-}
+  product?: Product
+};
 
 export const ADD_CART = gql`
-  mutation ADD_CART($id: string) {
-    id
-    imageUrl
-    price
-    title
-    amount
+  mutation ADD_CART($id: ID!) {
+    addCart(id: $id) {
+      id
+      amount
+      product {
+        id
+        imageUrl
+        price
+        title
+        description
+        createdAt
+      }
+    }
   }
-`
+`;
 
 export const UPDATE_CART = gql`
-  mutation UPDATE_CART($id: string, $amount: number) {
-    id
-    imageUrl
-    price
-    title
-    amount
+  mutation UPDATE_CART($addCartId: ID!, $amount: Int!) {
+    updateCart(id: $addCartId, amount: $amount) {
+      id
+      amount
+      product {
+        id
+        imageUrl
+        price
+        title
+        description
+        createdAt
+      }
+    }
   }
-`
+`;
 
 export const DELETE_CART = gql`
-  mutation DELETE_CART($id: string) {
-    id
+  mutation DELETE_CART($deleteCartId: ID!) {
+    deleteCart(id: $deleteCartId) {
+      id
+    }
   }
-`
+`;
 
 export const GET_CART = gql`
   query GET_CART {
-    id
-    imageUrl
-    price
-    title
+    cart {
+      id
+      amount
+      product {
+        id
+        imageUrl
+        price
+        title
+        description
+        createdAt
+      }
+    }
   }
-`
+`;

@@ -1,11 +1,5 @@
 import request, { RequestDocument } from "graphql-request";
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  QueryClient,
-  QueryClientProvider,
-} from "react-query";
+import { QueryClient } from "react-query";
 
 type AnyObject = {
   [key: string]: any;
@@ -27,7 +21,7 @@ export const getQueryClient = () => {
   return client;
 };
 
-const BASE_URL = "/";
+const BASE_URL = "http://localhost:8181/graphql";
 
 export const restFetcher = async ({
   method,

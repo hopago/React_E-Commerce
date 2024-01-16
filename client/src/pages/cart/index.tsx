@@ -2,13 +2,34 @@ import { useQuery } from "react-query"
 import { QueryKeys, graphqlFetcher } from "../../lib/react-query/queryClient"
 import { GET_CART } from "../../graphql/cart/cart"
 import CartList from "./_components/CartList";
+import { Product } from "../../graphql/products/products";
+
+export type CartQueryResult = {
+  cart: CartItems
+}
+
+export type CartItems = {
+  id: string;
+  amount: number;
+  product?: Product
+}[]
+
+export type CartItem = {
+  id: string;
+  amount: number;
+  product?: Product;
+}
 
 export default function CartIndex() {
-  const { data } = useQuery(QueryKeys.CART, () => graphqlFetcher(GET_CART), {
-    staleTime: 0,
-    cacheTime: 1000
-  });
-
+  const { data } = useQuery<CartQueryResult>(
+    QueryKeys.CART,
+    () => graphqlFetcher(GET_CART),
+    {
+      staleTime: 600 * 1000,
+      cacheTime: 600 * 1000,
+    }
+  );
+ 
   if (!data) {
     return (
       <div>
@@ -17,9 +38,7 @@ export default function CartIndex() {
     )
   }
 
-  const cartItems = Object.values(data);
-
   return (
-    <CartList items={cartItems} />
+    <CartList items={data.cart} />
   )
 }
