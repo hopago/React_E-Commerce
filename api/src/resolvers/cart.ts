@@ -1,4 +1,10 @@
+import { DBField, writeDB } from "../dbController.js";
+import { TCart } from "../types/cart.js";
 import { Resolver } from "./types.js";
+
+const setJSON = (data: TCart[]) => {
+  writeDB(DBField.CART, data);
+};
 
 const cartResolvers: Resolver = {
   Query: {
@@ -15,7 +21,7 @@ const cartResolvers: Resolver = {
 
       let newItem;
 
-      const findCartIndex = db.cart.findIndex(item => item.id === id);
+      const findCartIndex = db.cart.findIndex((item) => item.id === id);
       if (findCartIndex) {
         newItem = {
           ...db.cart[findCartIndex],
@@ -23,41 +29,58 @@ const cartResolvers: Resolver = {
         };
 
         db.cart.splice(findCartIndex, 1, newItem);
+
+        try {
+          setJSON(db.cart);
+        } catch (err) {
+          console.log(err);
+        }
       } else {
         newItem = {
           id,
-          product: {
-            ...targetProduct,
-          },
           amount: 1,
         };
 
         db.cart.push(newItem);
+
+        try {
+          setJSON(db.cart);
+        } catch (err) {
+          console.log(err);
+        }
       }
 
       return newItem;
     },
     updateCart: (_: any, { id, amount }, { db }) => {
-      const newCart = [...db.cart];
-      const findIndex = newCart.findIndex((item) => item.id === id);
-      if (!findIndex) throw new Error("없는 데이터입니다...");
+      const findIndex = db.cart.findIndex((item) => item.id === id);
+      if (findIndex === -1) throw new Error("없는 데이터입니다...");
 
       const newItem = {
-        ...newCart[findIndex],
+        id,
         amount,
       };
-      newCart[findIndex] = newItem;
-      db.cart = newCart;
+      db.cart.splice(findIndex, 1, newItem);
+
+      try {
+        writeDB(DBField.CART, db.cart);
+      } catch (err) {
+        console.log(err);
+      }
 
       return newItem;
     },
     deleteCart: (_: any, { id }, { db }) => {
-      const newData = [...db.cart];
       const findIndex = db.cart.findIndex((item) => item.id === id);
-      if (!findIndex) throw new Error("없는 데이터입니다...");
+      if (findIndex === -1) throw new Error("없는 데이터입니다...");
 
-      delete newData[findIndex];
-      db.cart = newData;
+      db.cart.splice(findIndex, 1);
+      
+      try {
+        writeDB(DBField.CART, db.cart);
+      } catch (err) {
+        console.log(err);
+      }
 
       return id;
     },
@@ -68,12 +91,18 @@ const cartResolvers: Resolver = {
 
       db.cart = newCartData;
 
+      try {
+        writeDB(DBField.CART, db.cart);
+      } catch (err) {
+        console.log(err);
+      }
+
       return ids;
     },
   },
   CartItem: {
     product: (cartItem, _, { db }) => {
-      return db.products.find(product => product.id === cartItem.id);
+      return db.products.find((product) => product.id === cartItem.id);
     },
   },
 };
