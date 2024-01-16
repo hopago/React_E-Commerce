@@ -8,8 +8,6 @@ import {
 import { ForwardedRef, SyntheticEvent, forwardRef, useEffect, useState } from "react";
 import { Product } from "../../../graphql/products/products";
 import { CartQueryResult } from "..";
-import { useRecoilValue } from "recoil";
-import { checkedCartState } from "../../../recoils/cart";
 
 type Props = {
   item: {

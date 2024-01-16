@@ -13,8 +13,8 @@ type PayInfo = string[]
 export default function Payment() {
   const [checkedCartData, setCheckedCartData] = useRecoilState(checkedCartState);
 
-  const { mutate: executePayment } = useMutation((payInfo: PayInfo) =>
-    graphqlFetcher(EXECUTE_PAYMENT, payInfo)
+  const { mutate: executePayment } = useMutation((ids: PayInfo) =>
+    graphqlFetcher(EXECUTE_PAYMENT, { ids })
   );
 
   const navigate = useNavigate();
@@ -26,13 +26,23 @@ export default function Payment() {
   };
 
   const onProceed = () => {
-    // 결제
+    // 결제 로직...
+    console.log("execute...");
 
-    const payInfo: PayInfo = checkedCartData.map(({ id }) => id);
-    executePayment(payInfo);
+    const ids: PayInfo = checkedCartData.map(({ id }) => id);
+
+    try {
+      executePayment(ids, {
+        onSuccess: () => {
+          alert("결제 완료되었습니다.");
+        }
+      });
+    } catch (err) {
+      console.log(err);
+    }
 
     setCheckedCartData([]);
-    navigate("/products", { replace: true }); // root or 결제완료 창으로 이동
+    navigate("/products", { replace: true });
   };
 
   const onCancel = () => {
